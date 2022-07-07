@@ -30,6 +30,3 @@ genesis:
         min_deposit:
           - amount: "10000000"
             denom: "abit"
-    evm:
-      params:
-        evm_denom: "abit"
