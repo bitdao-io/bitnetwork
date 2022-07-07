@@ -99,7 +99,7 @@ containerProtoGenAny=$(PROJECT_NAME)-proto-gen-any-$(protoVer)
 containerProtoGenSwagger=$(PROJECT_NAME)-proto-gen-swagger-$(protoVer)
 containerProtoFmt=$(PROJECT_NAME)-proto-fmt-$(protoVer)
 
-proto-all: proto-format proto-lint proto-gen
+proto-all: proto-format proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"

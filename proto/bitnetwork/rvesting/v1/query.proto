@@ -1,5 +1,5 @@
 syntax = "proto3";
-package teleport.rvesting.v1;
+package bitnetwork.rvesting.v1;
 
 import "gogoproto/gogo.proto";
 import "bitnetwork/rvesting/v1/genesis.proto";
