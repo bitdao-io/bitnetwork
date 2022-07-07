@@ -18,6 +18,8 @@ SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::') # grab everything after the space in "github.com/tendermint/tendermint v0.34.7"
 DOCKER := $(shell which docker)
 TEST_DOCKER_REPO=jackzampolin/gaiatest
+DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
+PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 
 export GO111MODULE = on
 
@@ -84,8 +86,82 @@ endif
 
 #$(info $$BUILD_FLAGS is [$(BUILD_FLAGS)])
 
-# The below include contains the tools target.
-include contrib/devtools/Makefile
+
+
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
+
+protoVer=v0.3
+protoImageName=tendermintdev/sdk-proto-gen:$(protoVer)
+containerProtoGen=$(PROJECT_NAME)-proto-gen-$(protoVer)
+containerProtoGenAny=$(PROJECT_NAME)-proto-gen-any-$(protoVer)
+containerProtoGenSwagger=$(PROJECT_NAME)-proto-gen-swagger-$(protoVer)
+containerProtoFmt=$(PROJECT_NAME)-proto-fmt-$(protoVer)
+
+proto-all: proto-format proto-lint proto-gen
+
+proto-gen:
+	@echo "Generating Protobuf files"
+	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGen}$$"; then docker start -a $(containerProtoGen); else docker run --name $(containerProtoGen) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
+		sh ./scripts/protocgen.sh; fi
+	go mod tidy
+
+proto-swagger-gen:
+	@echo "Generating Protobuf Swagger"
+	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGenSwagger}$$"; then docker start -a $(containerProtoGenSwagger); else docker run --name $(containerProtoGenSwagger) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
+		sh ./scripts/protoc-swagger-gen.sh; fi
+
+proto-format:
+	@echo "Formatting Protobuf files"
+	find . -name "*.proto" -not -path "./third_party/*"  -exec clang-format -i {} \;
+
+proto-lint:
+	@$(DOCKER_BUF) lint --error-format=json
+
+proto-check-breaking:
+	@$(DOCKER_BUF) breaking --against $(HTTPS_GIT)#branch=main
+
+
+TM_URL              = https://raw.githubusercontent.com/$(shell grep -m 1 "github.com/tendermint/tendermint" ./go.mod | sed 's/ /\//g' | sed 's/\t//g' | sed 's/github.com\///g')/proto/tendermint
+GOGO_PROTO_URL      = https://raw.githubusercontent.com/regen-network/protobuf/cosmos
+COSMOS_SDK_URL      = https://raw.githubusercontent.com/$(shell grep -m 1 "github.com/cosmos/cosmos-sdk" ./go.mod | sed 's/ /\//g' | sed 's/\t//g' | sed 's/github.com\///g')
+ETHERMINT_URL      	= https://raw.githubusercontent.com/$(shell grep -m 1 "github.com/tharsis/ethermint" ./go.mod | sed 's/ /\//g' | sed 's/\t//g' | sed 's/github.com\///g')
+IBC_GO_URL      	= https://raw.githubusercontent.com/$(shell grep -m 1 "github.com/cosmos/ibc-go" ./go.mod | sed 's/ /\//g' | sed 's/\t//g' | sed 's/github.com\///g')
+COSMOS_PROTO_URL    = https://raw.githubusercontent.com/regen-network/cosmos-proto/master
+
+TM_CRYPTO_TYPES     = third_party/proto/tendermint/crypto
+TM_ABCI_TYPES       = third_party/proto/tendermint/abci
+TM_TYPES            = third_party/proto/tendermint/types
+
+GOGO_PROTO_TYPES    = third_party/proto/gogoproto
+COSMOS_PROTO_TYPES  = third_party/proto/cosmos_proto
+
+proto-update-deps:
+	@mkdir -p $(GOGO_PROTO_TYPES)
+	@curl -sSL $(GOGO_PROTO_URL)/gogoproto/gogo.proto > $(GOGO_PROTO_TYPES)/gogo.proto
+
+	@mkdir -p $(COSMOS_PROTO_TYPES)
+	@curl -sSL $(COSMOS_PROTO_URL)/cosmos.proto > $(COSMOS_PROTO_TYPES)/cosmos.proto
+
+## Importing of tendermint protobuf definitions currently requires the
+## use of `sed` in order to build properly with cosmos-sdk's proto file layout
+## (which is the standard Buf.build FILE_LAYOUT)
+## Issue link: https://github.com/tendermint/tendermint/issues/5021
+	@mkdir -p $(TM_ABCI_TYPES)
+	@curl -sSL $(TM_URL)/abci/types.proto > $(TM_ABCI_TYPES)/types.proto
+
+	@mkdir -p $(TM_TYPES)
+	@curl -sSL $(TM_URL)/types/types.proto > $(TM_TYPES)/types.proto
+
+	@mkdir -p $(TM_CRYPTO_TYPES)
+	@curl -sSL $(TM_URL)/crypto/proof.proto > $(TM_CRYPTO_TYPES)/proof.proto
+	@curl -sSL $(TM_URL)/crypto/keys.proto > $(TM_CRYPTO_TYPES)/keys.proto
+
+
+
+.PHONY: proto-all proto-gen proto-gen-any proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps
+
 
 ###############################################################################
 ###                              Documentation                              ###
