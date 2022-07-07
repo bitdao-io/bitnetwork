@@ -18,6 +18,6 @@ WORKDIR /root
 
 COPY --from=build-env /go/src/github.com/bitdao-io/bitnetwork/build/bitnetwork /usr/bin/bitnetwork
 
-EXPOSE 26656 26657 1317 9090 8545
+EXPOSE 26656 26657 1317 9090
 
 CMD ["bitnetwork"]
