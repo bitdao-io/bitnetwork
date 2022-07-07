@@ -10,7 +10,6 @@
   - Dockerfile
   - docker-compose.yml
   - scripts/*
-  - config.yml
 "Type: CI":
   - .github/**/*.yml
   - buf.yaml
