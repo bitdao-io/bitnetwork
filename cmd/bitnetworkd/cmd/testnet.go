@@ -43,6 +43,7 @@ import (
 	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 
 	"github.com/bitdao-io/bitnetwork/app/params"
+	cointypes "github.com/bitdao-io/bitnetwork/types"
 )
 
 var (
@@ -213,17 +214,15 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
-		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
+		accStakingTokens := sdk.TokensFromConsensusPower(500, cointypes.PowerReduction)
 		coins := sdk.Coins{
-			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(bittypes.AttoBit, accStakingTokens),
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 
-		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)
+		valTokens := sdk.TokensFromConsensusPower(100, cointypes.PowerReduction)
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
