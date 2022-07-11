@@ -7,8 +7,13 @@ updates:
       time: "10:00"
     open-pull-requests-limit: 10
     reviewers:
+      - wukongcheng
+      - chengwenxi
+      - guoshijiang
+      - FletcherMan
+      - silmaj
       - Zer0ne001
-      - KaelTop
+      - bradyjoestar
     labels:
       - dependencies
   - package-ecosystem: docker
@@ -18,8 +23,13 @@ updates:
       time: "10:00"
     open-pull-requests-limit: 10
     reviewers:
+      - wukongcheng
+      - chengwenxi
+      - guoshijiang
+      - FletcherMan
+      - silmaj
       - Zer0ne001
-      - KaelTop
+      - bradyjoestar
   - package-ecosystem: gomod
     directory: "/"
     schedule:
