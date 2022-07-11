@@ -49,7 +49,7 @@ ifeq ($(LEDGER_ENABLED),true)
   endif
 endif
 
-ifeq (cleveldb,$(findstring cleveldb,$(GAIA_BUILD_OPTIONS)))
+ifeq (cleveldb,$(findstring cleveldb,$(BITNETWORK_BUILD_OPTIONS)))
   build_tags += gcc cleveldb
 endif
 build_tags += $(BUILD_TAGS)
@@ -62,17 +62,17 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaia \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiad \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=bitnetwork \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=bitnetworkd \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
 
-ifeq (cleveldb,$(findstring cleveldb,$(GAIA_BUILD_OPTIONS)))
+ifeq (cleveldb,$(findstring cleveldb,$(BITNETWORK_BUILD_OPTIONS)))
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
 endif
-ifeq (,$(findstring nostrip,$(GAIA_BUILD_OPTIONS)))
+ifeq (,$(findstring nostrip,$(BITNETWORK_BUILD_OPTIONS)))
   ldflags += -w -s
 endif
 ldflags += $(LDFLAGS)
@@ -80,7 +80,7 @@ ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 # check for nostrip option
-ifeq (,$(findstring nostrip,$(GAIA_BUILD_OPTIONS)))
+ifeq (,$(findstring nostrip,$(BITNETWORK_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
 endif
 
@@ -181,7 +181,7 @@ build-reproducible: go.sum
 	$(DOCKER) rm latest-build || true
 	$(DOCKER) run --volume=$(CURDIR):/sources:ro \
         --env TARGET_PLATFORMS='linux/amd64 darwin/amd64 linux/arm64 windows/amd64' \
-        --env APP=gaiad \
+        --env APP=bitnetworkd \
         --env VERSION=$(VERSION) \
         --env COMMIT=$(COMMIT) \
         --env LEDGER_ENABLED=$(LEDGER_ENABLED) \
@@ -205,7 +205,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/gaiad -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/bitnetworkd -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
 	rm -rf $(BUILDDIR)/ artifacts/
@@ -269,7 +269,7 @@ endif
 .PHONY: run-tests $(TEST_TARGETS)
 
 docker-build-debug:
-	@docker build -t cosmos/gaiad-e2e --build-arg IMG_TAG=debug -f e2e.Dockerfile .
+	@docker build -t cosmos/bitnetworkd-e2e --build-arg IMG_TAG=debug -f e2e.Dockerfile .
 
 # TODO: Push this to the Cosmos Dockerhub so we don't have to keep building it
 # in CI.
@@ -293,12 +293,12 @@ format:
 ###                                Localnet                                 ###
 ###############################################################################
 
-build-docker-gaiadnode:
+build-docker-bitnetworkdnode:
 	$(MAKE) -C networks/local
 
 # Run a 4-node testnet locally
 localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/gaiad/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/gaiad:Z tendermint/gaiadnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
+	@if ! [ -f build/node0/bitnetworkd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/bitnetworkd:Z tendermint/bitnetworkdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
 	docker-compose up -d
 
 # Stop testnet
@@ -317,7 +317,7 @@ test-docker-push: test-docker
 
 .PHONY: all build-linux install format lint \
 	go-mod-cache draw-deps clean build \
-	setup-transactions setup-contract-tests-data start-gaia run-lcd-contract-tests contract-tests \
+	setup-transactions setup-contract-tests-data start-bitnetwork run-lcd-contract-tests contract-tests \
 	benchmark \
-	build-docker-gaiadnode localnet-start localnet-stop \
+	build-docker-bitnetworkdnode localnet-start localnet-stop \
 	docker-single-node docker-build-debug docker-build-hermes
