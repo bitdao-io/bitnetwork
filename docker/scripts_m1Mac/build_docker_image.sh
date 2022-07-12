@@ -5,6 +5,6 @@ IMAGE_NAME=bitchain-compile-image
 
 mkdir ~/share_file
 
-docker build -t IMAGE_NAME .
+docker build -t bitchain-compile-image .
 
-docker run -it IMAGE_NAME --name=bitchain-generator -v ~/share_file:/share_file  /bin/bash
+docker run -it  --name=bitchain-generator -v ~/share_file:/share_file bitchain-compile-image /bin/bash
