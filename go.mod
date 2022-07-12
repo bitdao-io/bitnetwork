@@ -3,7 +3,7 @@ module github.com/bitdao-io/bitnetwork
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.45.5
+	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/iavl v0.17.3
 	github.com/cosmos/ibc-go/v3 v3.1.0
 	github.com/evmos/ethermint v0.17.0
