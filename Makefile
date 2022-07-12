@@ -17,6 +17,7 @@ LEDGER_ENABLED ?= true
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::') # grab everything after the space in "github.com/tendermint/tendermint v0.34.7"
 DOCKER := $(shell which docker)
+BUILDDIR ?= $(CURDIR)/build
 TEST_DOCKER_REPO=jackzampolin/gaiatest
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
@@ -176,6 +177,8 @@ build: BUILD_ARGS=-o $(BUILDDIR)/
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
+$(BUILDDIR)/:
+	mkdir -p $(BUILDDIR)/
 
 build-reproducible: go.sum
 	$(DOCKER) rm latest-build || true
