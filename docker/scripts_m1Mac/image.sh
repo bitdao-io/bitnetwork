@@ -2,7 +2,7 @@
 
 
 #operation in compile image
-cd /workspace/bitnetwork
+cd /share_file/bitnetwork
 make install
-mv /root/go/bin/bitnetworkd /workspace/bin/
+mv $GOPATH/bin/bitnetworkd /share_file/
 
