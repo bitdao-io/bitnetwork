@@ -16,7 +16,7 @@ RUN apt install ca-certificates jq -y
 
 WORKDIR /root
 
-COPY --from=build-env /go/src/github.com/bitdao-io/bitnetwork/build/bitnetwork /usr/bin/bitnetwork
+COPY --from=build-env /go/src/github.com/bitdao-io/bitnetwork/build/bitnetworkd /usr/bin/bitnetworkd
 
 EXPOSE 26656 26657 1317 9090
 
