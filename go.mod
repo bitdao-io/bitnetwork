@@ -6,7 +6,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.45.5
 	github.com/cosmos/iavl v0.17.3
 	github.com/cosmos/ibc-go/v3 v3.1.0
-	github.com/evmos/ethermint v0.17.0
+	github.com/evmos/ethermint v0.17.1
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.45.2
