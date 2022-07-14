@@ -10,7 +10,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	liquiditytypes "github.com/gravity-devs/liquidity/x/liquidity/types"
-	"net"
 	"os"
 	"path/filepath"
 
@@ -43,14 +42,15 @@ import (
 	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 
 	"github.com/bitdao-io/bitnetwork/app/params"
+	cointypes "github.com/bitdao-io/bitnetwork/types"
 )
 
 var (
-	flagNodeDirPrefix     = "node-dir-prefix"
-	flagNumValidators     = "v"
-	flagOutputDir         = "output-dir"
-	flagNodeDaemonHome    = "node-daemon-home"
-	flagStartingIPAddress = "starting-ip-address"
+	flagNodeDirPrefix  = "node-dir-prefix"
+	flagNumValidators  = "v"
+	flagOutputDir      = "output-dir"
+	flagNodeDaemonHome = "node-daemon-home"
+	flagIPAddrs        = "ip-addresses"
 )
 
 // get cmd to initialize all files for tendermint testnet and application
@@ -80,13 +80,13 @@ Example:
 			minGasPrices, _ := cmd.Flags().GetString(server.FlagMinGasPrices)
 			nodeDirPrefix, _ := cmd.Flags().GetString(flagNodeDirPrefix)
 			nodeDaemonHome, _ := cmd.Flags().GetString(flagNodeDaemonHome)
-			startingIPAddress, _ := cmd.Flags().GetString(flagStartingIPAddress)
+			ipAddresses, _ := cmd.Flags().GetStringSlice(flagIPAddrs)
 			numValidators, _ := cmd.Flags().GetInt(flagNumValidators)
 			algo, _ := cmd.Flags().GetString(flags.FlagKeyAlgorithm)
 
 			return InitTestnet(
 				clientCtx, cmd, config, mbm, genBalIterator, outputDir, chainID, minGasPrices,
-				nodeDirPrefix, nodeDaemonHome, startingIPAddress, keyringBackend, algo, numValidators,
+				nodeDirPrefix, nodeDaemonHome, ipAddresses, keyringBackend, algo, numValidators,
 			)
 		},
 	}
@@ -95,7 +95,7 @@ Example:
 	cmd.Flags().StringP(flagOutputDir, "o", "./mytestnet", "Directory to store initialization data for the testnet")
 	cmd.Flags().String(flagNodeDirPrefix, "node", "Prefix the directory name for each node with (node results in node0, node1, ...)")
 	cmd.Flags().String(flagNodeDaemonHome, "bitnetworkd", "Home directory of the node's daemon configuration")
-	cmd.Flags().String(flagStartingIPAddress, "192.168.0.1", "Starting IP address (192.168.0.1 results in persistent peers list ID0@192.168.0.1:46656, ID1@192.168.0.2:46656, ...)")
+	cmd.Flags().StringSlice(flagIPAddrs, []string{"192.168.0.1"}, "List of IP addresses to use (i.e. `192.168.0.1,172.168.0.1` results in persistent peers list ID0@192.168.0.1:46656, ID1@172.168.0.1)")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
 	cmd.Flags().String(server.FlagMinGasPrices, fmt.Sprintf("0.000006%s", bittypes.AttoBit), "Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.01photino,0.001stake)")
 	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
@@ -117,8 +117,8 @@ func InitTestnet(
 	chainID,
 	minGasPrices,
 	nodeDirPrefix,
-	nodeDaemonHome,
-	startingIPAddress,
+	nodeDaemonHome string,
+	ipAddresses []string,
 	keyringBackend,
 	algoStr string,
 	numValidators int,
@@ -169,12 +169,8 @@ func InitTestnet(
 
 		nodeConfig.Moniker = nodeDirName
 
-		ip, err := getIP(i, startingIPAddress)
-		if err != nil {
-			_ = os.RemoveAll(outputDir)
-			return err
-		}
-
+		ip := ipAddresses[i]
+		var err error
 		nodeIDs[i], valPubKeys[i], err = genutil.InitializeNodeValidatorFiles(nodeConfig)
 		if err != nil {
 			_ = os.RemoveAll(outputDir)
@@ -213,17 +209,15 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
-		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
+		accStakingTokens := sdk.TokensFromConsensusPower(500, cointypes.PowerReduction)
 		coins := sdk.Coins{
-			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(bittypes.AttoBit, accStakingTokens),
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 
-		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)
+		valTokens := sdk.TokensFromConsensusPower(100, cointypes.PowerReduction)
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
@@ -406,30 +400,6 @@ func collectGenFiles(
 	}
 
 	return nil
-}
-
-func getIP(i int, startingIPAddr string) (ip string, err error) {
-	if len(startingIPAddr) == 0 {
-		ip, err = server.ExternalIP()
-		if err != nil {
-			return "", err
-		}
-		return ip, nil
-	}
-	return calculateIP(startingIPAddr, i)
-}
-
-func calculateIP(ip string, i int) (string, error) {
-	ipv4 := net.ParseIP(ip).To4()
-	if ipv4 == nil {
-		return "", fmt.Errorf("%v: non ipv4 address", ip)
-	}
-
-	for j := 0; j < i; j++ {
-		ipv4[3]++
-	}
-
-	return ipv4.String(), nil
 }
 
 func writeFile(name string, dir string, contents []byte) error {

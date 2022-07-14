@@ -258,7 +258,7 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".bitnetwork")
 }
 
-// NewBitNetwork returns a reference to an initialized Gaia.
+// NewBitNetwork returns a reference to an initialized Bitnetwork.
 func NewBitNetwork(
 	logger log.Logger,
 	db dbm.DB, traceStore io.Writer,
@@ -712,7 +712,7 @@ func (app *BitNetwork) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
 
-// AppCodec returns Gaia's app codec.
+// AppCodec returns Bitnetwork's app codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -720,7 +720,7 @@ func (app *BitNetwork) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
-// InterfaceRegistry returns Gaia's InterfaceRegistry
+// InterfaceRegistry returns Bitnetwork's InterfaceRegistry
 func (app *BitNetwork) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
