@@ -1,14 +1,30 @@
 #!/bin/bash
 
-IMAGE_NAME=bitchain-compile-image
+
+IMAGE_ID=$(docker ps |grep bitchain-compile| awk '{print $1}')
 
 
-cd ~/share_file
-rm -rf bitnetwork
+rm -rf ~/share_file
+mkdir ~/share_file
 
-cp -r ~/bitchain/ethan/bitnetwork ~/share_file
-docker run -it bitchain-generator /share_file/bitnetwork/docker/scripts_m1Mac/image.sh
-mv ~/share_file/bitnetworkd $GOPATH/bin
+
+
+if test -z "$IMAGE_ID";then
+  echo "start init the docker image"
+  docker run -itd  --name=bitchain-compile -v ~/share_file:/share_file wosa/bitchain-compile	 /bin/bash
+  echo "finish init the docker image"
+else
+  docker restart -itd  bitchain-compile
+  echo "docker compile image already exists"
+fi
+
+rm -rf ~/share_file/bitnetwork
+cp -r ../../../bitnetwork ~/share_file/bitnetwork
+
+
+chmod 777  ~/share_file/bitnetwork/docker/scripts_m1Mac/image.sh
+docker exec -it bitchain-compile   /share_file/bitnetwork/docker/scripts_m1Mac/image.sh
+
 
 
 

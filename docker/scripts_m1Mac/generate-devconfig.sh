@@ -4,6 +4,9 @@
 
 
 
+mkdir ../bitnetwork_dev
+cd ../bitnetwork_dev
+
 rm -rf validators
 mkdir -p validators
 

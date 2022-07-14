@@ -1,4 +1,3 @@
-FROM ubuntu:20.04 AS compile-env
 FROM golang
 ENV GOPROXY=https://goproxy.cn
 RUN apt-get install git
