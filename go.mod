@@ -3,7 +3,7 @@ module github.com/bitdao-io/bitnetwork
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.45.5
+	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/iavl v0.17.3
 	github.com/cosmos/ibc-go/v3 v3.1.0
 	github.com/evmos/ethermint v0.17.0
@@ -11,7 +11,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.45.2
 	github.com/gorilla/mux v1.8.0
-	github.com/gravity-devs/liquidity v1.5.0
+	github.com/gravity-devs/liquidity v1.5.1
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
