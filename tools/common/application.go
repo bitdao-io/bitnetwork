@@ -4,8 +4,9 @@ import (
 	"crypto/sha256"
 	"path/filepath"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/iavl"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	dbm "github.com/tendermint/tm-db"
 

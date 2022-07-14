@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/gogo/protobuf/types"
 	dbm "github.com/tendermint/tm-db"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitdao-io/bitnetwork/tools/common"
 )

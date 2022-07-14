@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	bitKeyring "github.com/bitdao-io/bitnetwork/crypto/keyring"
+
 	"github.com/spf13/cobra"
+
+	bitKeyring "github.com/bitdao-io/bitnetwork/crypto/keyring"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"

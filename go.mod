@@ -1,6 +1,6 @@
 module github.com/bitdao-io/bitnetwork
 
-go 1.17
+go 1.18
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.5
