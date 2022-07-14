@@ -6,12 +6,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+
+	liquiditytypes "github.com/gravity-devs/liquidity/x/liquidity/types"
+
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	liquiditytypes "github.com/gravity-devs/liquidity/x/liquidity/types"
-	"os"
-	"path/filepath"
 
 	"github.com/evmos/ethermint/crypto/hd"
 	"github.com/spf13/cobra"
@@ -21,8 +23,12 @@ import (
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
 
+	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+
 	bitKeyring "github.com/bitdao-io/bitnetwork/crypto/keyring"
 	bittypes "github.com/bitdao-io/bitnetwork/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -38,8 +44,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 
 	"github.com/bitdao-io/bitnetwork/app/params"
 	cointypes "github.com/bitdao-io/bitnetwork/types"

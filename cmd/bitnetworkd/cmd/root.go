@@ -2,12 +2,23 @@ package cmd
 
 import (
 	"errors"
-	"github.com/bitdao-io/bitnetwork/crypto/keyring"
-	"github.com/bitdao-io/bitnetwork/tools"
-	"github.com/evmos/ethermint/encoding"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/evmos/ethermint/encoding"
+
+	"github.com/bitdao-io/bitnetwork/crypto/keyring"
+	"github.com/bitdao-io/bitnetwork/tools"
+
+	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+	ethermintclient "github.com/evmos/ethermint/client"
+	"github.com/spf13/cast"
+	"github.com/spf13/cobra"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -27,14 +38,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	ethermintclient "github.com/evmos/ethermint/client"
-	"github.com/spf13/cast"
-	"github.com/spf13/cobra"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/bitdao-io/bitnetwork/app"
 	"github.com/bitdao-io/bitnetwork/app/params"

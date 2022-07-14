@@ -3,8 +3,9 @@ package common
 import (
 	"path/filepath"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	dbm "github.com/tendermint/tm-db"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func OpenBlockStoreDB(rootDir string) (dbm.DB, error) {
