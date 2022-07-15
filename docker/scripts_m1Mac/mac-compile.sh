@@ -4,8 +4,10 @@
 IMAGE_ID=$(docker ps |grep bitchain-compile| awk '{print $1}')
 
 
-rm -rf ~/share_file
-mkdir ~/share_file
+
+if [ ! -d "$HOME/share_file/" ];then
+  mkdir $HOME/share_file
+fi
 
 
 
